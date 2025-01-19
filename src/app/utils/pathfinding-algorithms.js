@@ -6,7 +6,7 @@
     //      start -- the starting cell -- 4
     //      end -- the goal cell -- 5
 
-export const bfs = async (grid, start_x, start_y, setVisited, setPath, end_x, end_y) => {
+export const bfs = async (grid, start_x, start_y, setVisited, setPath, end_x, end_y, stopper) => {
     try {
         if(!start_x || !start_y || !grid || !setVisited || !setPath) {
             return [];
@@ -39,6 +39,12 @@ export const bfs = async (grid, start_x, start_y, setVisited, setPath, end_x, en
         const promises = [];
 
         while(queue.length > 0) {
+
+            if (stopper) {
+                return [];
+            }
+
+
             const [{x, y}, currPath] = queue.shift();
             const cell = grid[y][x];
         
@@ -87,7 +93,7 @@ export const bfs = async (grid, start_x, start_y, setVisited, setPath, end_x, en
     
 }
 
-export const dfs = async (grid, start_x, start_y, setVisited, setPath, end_x, end_y) => {
+export const dfs = async (grid, start_x, start_y, setVisited, setPath, end_x, end_y, stopper) => {
     try {
         if(!start_x || !start_y || !grid || !setVisited || !setPath) {
             return [];
@@ -98,6 +104,8 @@ export const dfs = async (grid, start_x, start_y, setVisited, setPath, end_x, en
         const stack = [];
         const height = grid.length;
         const width = grid[0].length;
+
+        const visited = new Set();
 
         stack.push([{x : start_x, y : start_y}, [{x : start_x, y : start_y}]]);
 
@@ -117,13 +125,19 @@ export const dfs = async (grid, start_x, start_y, setVisited, setPath, end_x, en
         ]
 
         while(stack.length !== 0) {
+
+            if (stopper) {
+                return [];
+            }
+
             const current = stack.pop();
             let x = current[0].x;
             let y = current[0].y;
             console.log(`x : ${x} , y : ${y}`);
             const currPath = current[1]
 
-            if (grid[y][x].type !== 1) {
+            if (!visited.has(`${x},${y}`)) {
+                visited.add(`${x},${y}`);
                 await setVisited(x, y);
 
                 for(const {dx, dy} of directions) {

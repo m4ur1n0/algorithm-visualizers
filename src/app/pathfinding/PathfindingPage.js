@@ -15,6 +15,9 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 
+const delay = async (ms) => {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
 
 
 export default function PathfindingPage() {
@@ -22,6 +25,8 @@ export default function PathfindingPage() {
 
   const {initializeGrid, gridVals, startPlaced, selectorMode, setModeToWall, setModeToStart, setModeToEnd, setModeToBlank, setCellViewed, setCellPath, algorithm, setAlgorithm} = useGridContext();
   const [algoRunning, setAlgoRunning] = useState(false);
+  const [preempter, setPreempter] = useState(false); // on true -- algorithm stops
+
 
 
   useEffect(() => {
@@ -31,6 +36,16 @@ export default function PathfindingPage() {
   const algorithms = {
     'bfs' : bfs,
     'dfs' : dfs,
+  }
+
+  const fix = async () => {
+    await delay(1000);
+    setPreempter(false);
+  }
+
+  const preempt = async () => {
+    setPreempter(true);
+    // fix();
   }
   
 
@@ -108,7 +123,7 @@ export default function PathfindingPage() {
                   return;
                 }
                 setAlgoRunning(true);
-                algorithms[algorithm](gridVals, startPlaced.x, startPlaced.y, setCellViewed, setCellPath, 0, 0).then(async (path) => {
+                algorithms[algorithm](gridVals, startPlaced.x, startPlaced.y, setCellViewed, setCellPath, 0, 0, preempter).then(async (path) => {
                   if (!path) {
                     return;
                   }
@@ -123,6 +138,16 @@ export default function PathfindingPage() {
             >
               {algoRunning ? "running..." : "RUN"}
             </Button>
+
+            {algoRunning &&
+              <Button
+              className='mt-24 w-full'
+              variant='destructive'
+              onClick={preempt}
+            >
+              Cancel
+            </Button>}
+
             
             
           </div>

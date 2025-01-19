@@ -6,6 +6,7 @@ const PathfinderGrid = () => {
     
     const {gridVals, updateCellType, setCellWall} = useGridContext();
     const {selectorMode} = useGridContext();
+    const [preempter, setPreempter] = useState(false); // on true -- algorithm stops
 
 
 

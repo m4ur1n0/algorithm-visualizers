@@ -135,6 +135,8 @@ export const GridProvider = ({ children }) => {
   const [algorithm, setAlgorithm] = useState(null);
 
 
+
+
   // Context value
   const value = {
     gridVals,
