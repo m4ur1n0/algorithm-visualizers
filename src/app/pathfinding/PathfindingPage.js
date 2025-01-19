@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import PathfinderGrid from '@/components/PathfinderGrid';
 import { GridProvider, useGridContext } from '@/context/GridContext';
 import { Button } from '@/components/ui/button';
-import { bfs } from '../utils/pathfinding-algorithms';
+import { bfs, dfs } from '../utils/pathfinding-algorithms';
 import {
   Select,
   SelectContent,
@@ -30,6 +30,7 @@ export default function PathfindingPage() {
 
   const algorithms = {
     'bfs' : bfs,
+    'dfs' : dfs,
   }
   
 
@@ -53,6 +54,7 @@ export default function PathfindingPage() {
                 <SelectGroup>
                   <SelectLabel>Algorithms</SelectLabel>
                   <SelectItem value='bfs'>Breadth First Search</SelectItem>
+                  <SelectItem value='dfs'>Depth First Search</SelectItem>
                 </SelectGroup>
               </SelectContent>
             </Select>
@@ -106,7 +108,7 @@ export default function PathfindingPage() {
                   return;
                 }
                 setAlgoRunning(true);
-                algorithms[algorithm](gridVals, startPlaced.x, startPlaced.y, setCellViewed, setCellPath).then(async (path) => {
+                algorithms[algorithm](gridVals, startPlaced.x, startPlaced.y, setCellViewed, setCellPath, 0, 0).then(async (path) => {
                   if (!path) {
                     return;
                   }

@@ -9,7 +9,7 @@
 export const bfs = async (grid, start_x, start_y, setVisited, setPath, end_x, end_y) => {
     try {
         if(!start_x || !start_y || !grid || !setVisited || !setPath) {
-            return false;
+            return [];
         }
         
         const queue = [];
@@ -88,5 +88,69 @@ export const bfs = async (grid, start_x, start_y, setVisited, setPath, end_x, en
 }
 
 export const dfs = async (grid, start_x, start_y, setVisited, setPath, end_x, end_y) => {
+    try {
+        if(!start_x || !start_y || !grid || !setVisited || !setPath) {
+            return [];
+        }
 
+        console.log("dfs");
+
+        const stack = [];
+        const height = grid.length;
+        const width = grid[0].length;
+
+        stack.push([{x : start_x, y : start_y}, [{x : start_x, y : start_y}]]);
+
+        const directions = [ // don't want to include diagonals because paths should be real
+            {
+                dx : 0, dy : -1 // up
+            },
+            {
+                dx : 0, dy : 1 // down
+            },
+            {
+                dx : -1, dy : 0 // left
+            },
+            {
+                dx : 1, dy : 0 // right
+            }
+        ]
+
+        while(stack.length !== 0) {
+            const current = stack.pop();
+            let x = current[0].x;
+            let y = current[0].y;
+            console.log(`x : ${x} , y : ${y}`);
+            const currPath = current[1]
+
+            if (grid[y][x].type !== 1) {
+                await setVisited(x, y);
+
+                for(const {dx, dy} of directions) {
+                    const newX = x + dx;
+                    const newY = y + dy;
+                    const n = {x : newX, y: newY};
+
+                    if(newX >= 0 && newX < width && newY >= 0 && newY < height) {
+                        if (grid[newY][newX].type === 5) {
+                            return [...currPath, n];
+                        }
+
+                        if (grid[newY][newX].type === 0) {
+                            stack.push([n, [...currPath, n]]);
+                        }
+                    }
+                }
+            }
+
+
+        }
+
+        //failure
+        return [];
+
+    } catch (err) {
+        console.log("error ocurred during dfs", err);
+        return [];
+    }
 }
