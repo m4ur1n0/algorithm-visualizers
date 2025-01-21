@@ -168,3 +168,11 @@ export const dfs = async (grid, start_x, start_y, setVisited, setPath, end_x, en
         return [];
     }
 }
+
+function calculateF(x, y, endX, endY, g) {
+    return 1;
+}
+
+const a_star = async (grid, start_x, start_y, setVisited, setPath, end_x, end_y, stopper) => {
+    return [];
+}
