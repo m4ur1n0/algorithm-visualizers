@@ -1,4 +1,5 @@
 // context/GridContext.js
+import { ChartNoAxesColumnDecreasingIcon } from "lucide-react";
 import React, { createContext, useContext, useState, useCallback, useEffect } from "react";
 
 const GridContext = createContext();
@@ -9,12 +10,12 @@ const delay = async (ms) => {
 
 export const GridProvider = ({ children }) => {
   const [gridVals, setGridVals] = useState([]);
-  const [startPlaced, setStartPlaced] = useState(null);
+  const [startPlaced, setStartPlaced] = useState({x : -1, y : -1});
   // const dflt = (x, y) => {console.log("")};
 
   // Initialize the grid
   const initializeGrid = (cols, rows) => {
-    setStartPlaced(null);
+    setStartPlaced({x : -1, y: -1});
     const initialGrid = Array.from({ length: rows }, (_, y) =>
 
       Array.from({ length: cols }, (_, x) => ({
@@ -54,6 +55,11 @@ export const GridProvider = ({ children }) => {
   
   const setCellBlank = (x, y) => {
     
+    if(startPlaced.x === x && startPlaced.y === y) {
+      setStartPlaced({x: -1, y: -1});
+      console.log("setBlank thinks it is erasing start");
+    }
+
     updateCellType(x, y, 0);
     
   }
@@ -63,6 +69,7 @@ export const GridProvider = ({ children }) => {
       await delay(50); 
       updateCellType(x, y, 1);
     }
+    return;
   }
 
   const setCellPath = async (x, y) => {
@@ -70,22 +77,43 @@ export const GridProvider = ({ children }) => {
     if (gridVals[y][x].type!==4&&gridVals[y][x].type!==5) {  
       await delay(50); 
       updateCellType(x, y, 2);
+
     }
+    return;
     
   }
 
   const setCellWall = (x, y) => {
     
+    if(startPlaced.x === x && startPlaced.y === y) {
+      setStartPlaced({x: -1, y: -1});
+    }
+
     updateCellType(x, y, 3);
     
   }
 
   const setCellStart = (x, y) => {
-    if (!startPlaced) {  
+
+    setStartPlaced((prevStartPlaced) => {
+      if(prevStartPlaced.x !== -1) {
+        setCellBlank(startPlaced.x, startPlaced.y);
+        console.log("cleared start from",startPlaced.x, startPlaced.y);
+
+      }
+
       updateCellType(x, y, 4);
-      setStartPlaced({x, y});
-      setModeToWall();
-    }
+      const newStartPlacement = {x : x, y : y};
+      console.log(`placed start : ${JSON.stringify(startPlaced)}, ${JSON.stringify(newStartPlacement)}`);
+      return newStartPlacement;
+    })
+
+
+    // if(startPlaced.x === -1) {
+    //   setStartPlaced({x, y});
+    //   updateCellType(x, y, 4);
+    // }
+    setSelectorMode({func : setCellWall});
   }
 
   const setCellEnd = (x, y) => {
