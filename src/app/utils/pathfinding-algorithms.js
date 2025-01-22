@@ -40,7 +40,7 @@ export const bfs = async (grid, start_x, start_y, setVisited, setPath, endList, 
 
         while(queue.length > 0) {
 
-            if (stopper) {
+            if (stopper.shouldStop) {
                 return [];
             }
 
@@ -126,7 +126,7 @@ export const dfs = async (grid, start_x, start_y, setVisited, setPath, endList, 
 
         while(stack.length !== 0) {
 
-            if (stopper) {
+            if (stopper.shouldStop) {
                 return [];
             }
 
@@ -173,7 +173,7 @@ export const dfs = async (grid, start_x, start_y, setVisited, setPath, endList, 
 
 
 function getSquareDist(x1, y1, x2, y2) {
-    console.log(`finding dist btw (${x1},${y1}) and (${x2},${y2})`);
+    // console.log(`finding dist btw (${x1},${y1}) and (${x2},${y2})`);
     return ((x1-x2)**2)+((y1-y2)**2);
 }
 
@@ -209,7 +209,7 @@ function insertIntoPriQ(priorityList, newNode) {
         ) {
             priorityList.splice(i, 0, newNode);
 
-            console.log(`added to list : ${JSON.stringify(newNode)}`);
+            // console.log(`added to list : ${JSON.stringify(newNode)}`);
             return priorityList;
         }
     }
@@ -303,8 +303,13 @@ export const a_star = async (grid, start_x, start_y, setVisited, setPath, endLis
         let closedList = [];
 
         
-        console.log("beginning while true : ");
         while (true) {
+
+            if (stopper.shouldStop) {
+                console.log("stopping?");
+                return [];
+            }
+
             // consider node with lowest f in open list
             if (openList.length === 0) {
                 // console.log("No path found");
@@ -323,7 +328,7 @@ export const a_star = async (grid, start_x, start_y, setVisited, setPath, endLis
             closedList.push(lowestFCell);
             const promises = [];
 
-            console.log(`traversing neighbors of ${JSON.stringify(lowestFCell)}`)
+            // console.log(`traversing neighbors of ${JSON.stringify(lowestFCell)}`)
             for(const {dx, dy} of directions) {
                 const nextCell = {x : lowestFCell.x + dx, y : lowestFCell.y + dy};
                 if (
@@ -335,14 +340,14 @@ export const a_star = async (grid, start_x, start_y, setVisited, setPath, endLis
                 const cellKey = `${nextCell.x},${nextCell.y}`;
                 const parent = parents[cellKey];
 
-                console.log("getting here");
+                // console.log("getting here");
                 let g;
                 if (parent===0 || parent===undefined) {
                     g = 1;
                 } else {
                     g = parent.g + 1;
                 }
-                console.log("also getting here");
+                // console.log("also getting here");
 
 
                 let h = getSquareDist(nextCell.x, nextCell.y, endX, endY);
@@ -386,5 +391,73 @@ export const a_star = async (grid, start_x, start_y, setVisited, setPath, endLis
         console.log("error ocurred during a* pathfinding", err);
         return [];
     }
+
+}
+
+function get_direction() {
+    const directions = [ // don't want to include diagonals because paths should be real
+        {
+            dx : 0, dy : -1 // up
+        },
+        {
+            dx : 0, dy : 1 // down
+        },
+        {
+            dx : -1, dy : 0 // left
+        },
+        {
+            dx : 1, dy : 0 // right
+        }
+    ]
+
+    const randint = Math.floor(Math.random() * 4);
+    // console.log(randint);
+
+    return directions[randint];
+
+}
+
+
+export const random_walk = async (grid, start_x, start_y, setVisited, setPath, endList, stopper) => {
+
+    const width = grid[0].length;
+    const height = grid.length;
+
+    let curr = {x : start_x, y : start_y};
+
+    const path = [curr];
+    
+
+    const endXs = new Set()
+    const endYs = new Set()
+    const visited = new Set();
+
+    for(const endNode of endList) {
+        endXs.add(endNode.x);
+        endYs.add(endNode.y);
+    }
+
+    while (!(endXs.has(curr.x)&&endYs.has(curr.y))) {
+
+        if(stopper.shouldStop) {
+            return [];
+        }
+
+        visited.add(`${curr.x},${curr.y}`);
+        await setVisited(curr.x, curr.y);
+
+        path.push(curr);
+
+        const {dx, dy} = get_direction();
+        const next = {x : curr.x + dx, y : curr.y + dy};
+
+        if(next.x < width && next.y < height && next.x >= 0 && next.y >= 0 && !visited.has(`${next.x},${next.y}`)) {
+            curr = next;
+
+        }
+        
+    }
+
+    return path;
 
 }

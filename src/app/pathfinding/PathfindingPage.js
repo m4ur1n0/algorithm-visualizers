@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import PathfinderGrid from '@/components/PathfinderGrid';
 import { GridProvider, useGridContext } from '@/context/GridContext';
 import { Button } from '@/components/ui/button';
-import { bfs, dfs, a_star } from '../utils/pathfinding-algorithms';
+import { bfs, dfs, a_star, random_walk } from '../utils/pathfinding-algorithms';
 import {
   Select,
   SelectContent,
@@ -23,9 +23,10 @@ const delay = async (ms) => {
 export default function PathfindingPage() {
 
 
-  const {initializeGrid, gridVals, ends, startPlaced, selectorMode, setModeToWall, setModeToStart, setModeToEnd, setModeToBlank, setCellViewed, setCellPath, setCellBlank, algorithm, setAlgorithm} = useGridContext();
+  const {initializeGrid, setCellWall, gridVals, ends, startPlaced, selectorMode, setModeToWall, setModeToStart, setModeToEnd, setModeToBlank, setCellViewed, setCellPath, setCellBlank, algorithm, setAlgorithm} = useGridContext();
   const [algoRunning, setAlgoRunning] = useState(false);
-  const [preempter, setPreempter] = useState(false); // on true -- algorithm stops
+  // const [preempter, setPreempter] = useState(false); // on true -- algorithm stops
+  const preempter = useRef({shouldStop : false});
 
 
 
@@ -37,6 +38,7 @@ export default function PathfindingPage() {
     'bfs' : bfs,
     'dfs' : dfs,
     'astar' : a_star,
+    'randomWalk': random_walk,
   }
 
   const fix = async () => {
@@ -47,6 +49,19 @@ export default function PathfindingPage() {
   const preempt = async () => {
     setPreempter(true);
     // fix();
+  }
+
+  function setMaze() {
+    initializeGrid(48, 32);
+
+    for(const row of gridVals) {
+      for(const cell of row) {
+        const chance = Math.random() * (3); 
+        if(chance > 2) {
+          setCellWall(cell.x, cell.y);
+        }
+      }
+    }
   }
   
 
@@ -60,8 +75,20 @@ export default function PathfindingPage() {
       </div>
 
       <div className="pathfinding-control-panel w-[27%] h-full border border-gray-300 rounded-lg shadow-inner py-8 px-4">
-        <div className="control-panel-title flex flex-col w-full">
+        <div className="control-panel-title flex flex-row items-center w-full h-[10%]">
           <h1>Controls</h1>
+          {
+            true &&
+            <Button
+              className='rounded-full scale-[0.8] ml-56'
+              variant="destructive"
+              onClick={() => {preempter.current.shouldStop = true; setAlgoRunning(false);}}
+            >
+              <div className='bg-white w-[12px] h-[12px]' />
+            </Button>
+          }
+        </div>
+        <div className='control-panel-body flex flex-col w-full'>
             <Select onValueChange={(val) => {if(val==='astar'){alert("NOTE: A* prefers to be able to move diagonally, this implementation has not yet been optimized to find the best path WITHOUT diagonal movement, the way A* prefers.")} setAlgorithm(val)}}>
               <SelectTrigger className='my-5'>
                 <SelectValue placeholder='Select an algorithm...' />
@@ -72,6 +99,7 @@ export default function PathfindingPage() {
                   <SelectItem value='bfs'>Breadth First Search</SelectItem>
                   <SelectItem value='dfs'>Depth First Search</SelectItem>
                   <SelectItem value='astar'>A☆</SelectItem>
+                  <SelectItem value='randomWalk'>Random Walk (no revisit)</SelectItem>
 
                 </SelectGroup>
               </SelectContent>
@@ -119,49 +147,54 @@ export default function PathfindingPage() {
             </Button>
 
             <Button
-              className='mt-5 w-full bg-gray-900 text-white hover:bg-gray-600'
+              className={`mt-5 w-full bg-gray-900 text-white ${!algoRunning && 'hover:bg-gray-600'}`}
               variant={algoRunning ? 'loading' : 'secondary'}
               onClick={async () => {
-                if(!startPlaced || !algorithm) {
+                if (!startPlaced || !algorithm) {
                   return;
                 }
 
-                if(!algoRunning) {
-                  for(const row of gridVals) {
-                    for(const cell of row) {
-                      if(cell.type === 1 || cell.type === 2) {
-                        setCellBlank(cell.x, cell.y);
-                      }
+                // Initialize preempter
+                preempter.current.shouldStop = false;
+
+                // Clear previous paths and viewed cells
+                for (const row of gridVals) {
+                  for (const cell of row) {
+                    if (cell.type === 1 || cell.type === 2) {
+                      setCellBlank(cell.x, cell.y);
                     }
                   }
                 }
 
                 setAlgoRunning(true);
-                algorithms[algorithm](gridVals, startPlaced.x, startPlaced.y, setCellViewed, setCellPath, ends, preempter).then(async (path) => {
-                  if (!path) {
+
+                // Start the algorithm
+                algorithms[algorithm](gridVals, startPlaced.x, startPlaced.y, setCellViewed, setCellPath, ends, preempter.current).then(async (path) => {
+                  if (preempter.shouldStop || !path) {
+                    setAlgoRunning(false); // Ensure the state is reset
                     return;
                   }
+                  
                   console.log(path);
                   for (const coord of path) {
                     await setCellPath(coord.x, coord.y);
                   }
                   setAlgoRunning(false);
-                })
-                  
-
+                });
               }}
             >
               {algoRunning ? "running..." : "RUN"}
             </Button>
 
-            {/* {algoRunning &&
-              <Button
-              className='mt-24 w-full'
-              variant='destructive'
-              onClick={preempt}
+
+
+            <Button
+              className='mt-5 w-full'
+              variant='secondary'
+              onClick={setMaze}
             >
-              Cancel
-            </Button>} */}
+              Generate Walls
+            </Button>
 
             
             
