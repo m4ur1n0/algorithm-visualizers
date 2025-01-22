@@ -62,7 +62,7 @@ export default function PathfindingPage() {
       <div className="pathfinding-control-panel w-[27%] h-full border border-gray-300 rounded-lg shadow-inner py-8 px-4">
         <div className="control-panel-title flex flex-col w-full">
           <h1>Controls</h1>
-            <Select onValueChange={(val) => {if(val==='astar'){alert("NOTE: A* prefers to be able to move diagonally, this implementation has not yet been optimized to find the best path, the way A* should")}setAlgorithm(val)}}>
+            <Select onValueChange={(val) => {if(val==='astar'){alert("NOTE: A* prefers to be able to move diagonally, this implementation has not yet been optimized to find the best path WITHOUT diagonal movement, the way A* prefers.")} setAlgorithm(val)}}>
               <SelectTrigger className='my-5'>
                 <SelectValue placeholder='Select an algorithm...' />
               </SelectTrigger>
