@@ -31,7 +31,7 @@ const GraphCell = React.memo(({cellData}) => {
   // });
 
   return (
-    <div className={`graph-cell border border-grey-900`} style={cellStyle}>
+    <div className={`graph-cell border border-gray-300`} style={cellStyle}>
       {/* Example: Displaying x and y coordinates */}
       {/* {`${x},${y}`} */}
       {/* {cellData.x} */}

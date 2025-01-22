@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import PathfinderGrid from '@/components/PathfinderGrid';
 import { GridProvider, useGridContext } from '@/context/GridContext';
 import { Button } from '@/components/ui/button';
-import { bfs, dfs } from '../utils/pathfinding-algorithms';
+import { bfs, dfs, a_star } from '../utils/pathfinding-algorithms';
 import {
   Select,
   SelectContent,
@@ -23,7 +23,7 @@ const delay = async (ms) => {
 export default function PathfindingPage() {
 
 
-  const {initializeGrid, gridVals, startPlaced, selectorMode, setModeToWall, setModeToStart, setModeToEnd, setModeToBlank, setCellViewed, setCellPath, algorithm, setAlgorithm} = useGridContext();
+  const {initializeGrid, gridVals, ends, startPlaced, selectorMode, setModeToWall, setModeToStart, setModeToEnd, setModeToBlank, setCellViewed, setCellPath, setCellBlank, algorithm, setAlgorithm} = useGridContext();
   const [algoRunning, setAlgoRunning] = useState(false);
   const [preempter, setPreempter] = useState(false); // on true -- algorithm stops
 
@@ -36,6 +36,7 @@ export default function PathfindingPage() {
   const algorithms = {
     'bfs' : bfs,
     'dfs' : dfs,
+    'astar' : a_star,
   }
 
   const fix = async () => {
@@ -61,7 +62,7 @@ export default function PathfindingPage() {
       <div className="pathfinding-control-panel w-[27%] h-full border border-gray-300 rounded-lg shadow-inner py-8 px-4">
         <div className="control-panel-title flex flex-col w-full">
           <h1>Controls</h1>
-            <Select onValueChange={(val) => setAlgorithm(val)}>
+            <Select onValueChange={(val) => {if(val==='astar'){alert("NOTE: A* prefers to be able to move diagonally, this implementation has not yet been optimized to find the best path, the way A* should")}setAlgorithm(val)}}>
               <SelectTrigger className='my-5'>
                 <SelectValue placeholder='Select an algorithm...' />
               </SelectTrigger>
@@ -70,6 +71,8 @@ export default function PathfindingPage() {
                   <SelectLabel>Algorithms</SelectLabel>
                   <SelectItem value='bfs'>Breadth First Search</SelectItem>
                   <SelectItem value='dfs'>Depth First Search</SelectItem>
+                  <SelectItem value='astar'>A*</SelectItem>
+
                 </SelectGroup>
               </SelectContent>
             </Select>
@@ -122,11 +125,23 @@ export default function PathfindingPage() {
                 if(!startPlaced || !algorithm) {
                   return;
                 }
+
+                if(!algoRunning) {
+                  for(const row of gridVals) {
+                    for(const cell of row) {
+                      if(cell.type === 1 || cell.type === 2) {
+                        setCellBlank(cell.x, cell.y);
+                      }
+                    }
+                  }
+                }
+
                 setAlgoRunning(true);
-                algorithms[algorithm](gridVals, startPlaced.x, startPlaced.y, setCellViewed, setCellPath, 0, 0, preempter).then(async (path) => {
+                algorithms[algorithm](gridVals, startPlaced.x, startPlaced.y, setCellViewed, setCellPath, ends, preempter).then(async (path) => {
                   if (!path) {
                     return;
                   }
+                  console.log(path);
                   for (const coord of path) {
                     await setCellPath(coord.x, coord.y);
                   }
@@ -139,14 +154,14 @@ export default function PathfindingPage() {
               {algoRunning ? "running..." : "RUN"}
             </Button>
 
-            {algoRunning &&
+            {/* {algoRunning &&
               <Button
               className='mt-24 w-full'
               variant='destructive'
               onClick={preempt}
             >
               Cancel
-            </Button>}
+            </Button>} */}
 
             
             

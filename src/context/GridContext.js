@@ -11,11 +11,26 @@ const delay = async (ms) => {
 export const GridProvider = ({ children }) => {
   const [gridVals, setGridVals] = useState([]);
   const [startPlaced, setStartPlaced] = useState({x : -1, y : -1});
+  const [ends, setEnds] = useState([]);
+
+  const appendEnd = (newEnd) => {
+    setEnds([...ends, newEnd]);
+  }
+
+  const removeEnd = (end) => {
+    ends.forEach((existingEnd, idx) => {
+      if (existingEnd.x === end.x && existingEnd.y === end.y) {
+        setEnds([...(ends.splice(idx, 1))]);
+        return;
+      }
+    })
+  }
   // const dflt = (x, y) => {console.log("")};
 
   // Initialize the grid
   const initializeGrid = (cols, rows) => {
     setStartPlaced({x : -1, y: -1});
+    setEnds([]);
     const initialGrid = Array.from({ length: rows }, (_, y) =>
 
       Array.from({ length: cols }, (_, x) => ({
@@ -60,8 +75,11 @@ export const GridProvider = ({ children }) => {
       console.log("setBlank thinks it is erasing start");
     }
 
+
+
     updateCellType(x, y, 0);
-    
+    removeEnd({x,y});
+
   }
 
   const setCellViewed = async (x, y) => {
@@ -88,8 +106,11 @@ export const GridProvider = ({ children }) => {
     if(startPlaced.x === x && startPlaced.y === y) {
       setStartPlaced({x: -1, y: -1});
     }
+    
 
     updateCellType(x, y, 3);
+    removeEnd({x, y});
+
     
   }
 
@@ -104,7 +125,9 @@ export const GridProvider = ({ children }) => {
 
       updateCellType(x, y, 4);
       const newStartPlacement = {x : x, y : y};
-      console.log(`placed start : ${JSON.stringify(startPlaced)}, ${JSON.stringify(newStartPlacement)}`);
+      // console.log(`placed start : ${JSON.stringify(startPlaced)}, ${JSON.stringify(newStartPlacement)}`);
+      removeEnd({x, y});
+
       return newStartPlacement;
     })
 
@@ -118,6 +141,7 @@ export const GridProvider = ({ children }) => {
 
   const setCellEnd = (x, y) => {
     if (gridVals[y][x].type!==4) { // can't set end as start :/
+      appendEnd({x, y});
       updateCellType(x, y, 5);
     }
     
@@ -185,6 +209,7 @@ export const GridProvider = ({ children }) => {
     startPlaced,
     algorithm,
     setAlgorithm,
+    ends,
 
   };
 
