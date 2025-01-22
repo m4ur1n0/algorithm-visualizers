@@ -71,7 +71,7 @@ export default function PathfindingPage() {
                   <SelectLabel>Algorithms</SelectLabel>
                   <SelectItem value='bfs'>Breadth First Search</SelectItem>
                   <SelectItem value='dfs'>Depth First Search</SelectItem>
-                  <SelectItem value='astar'>A*</SelectItem>
+                  <SelectItem value='astar'>A☆</SelectItem>
 
                 </SelectGroup>
               </SelectContent>
