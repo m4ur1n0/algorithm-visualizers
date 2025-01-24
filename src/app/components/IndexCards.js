@@ -15,7 +15,9 @@ const IndexCards = ({url, title, image_path, description}) => {
         <a>
             <Card className='w-[350px] h-[450px] transition-transform duration-500 ease-in-out hover:scale-[1.05]' >
                 <CardHeader className='object-cover'>
-                    <img src={image_path} className='w-full bg-gray-300' />
+                    <div className='w-full bg-gray-300 flex flex-col justify-center items-center'>
+                        <img src={image_path} className={` ${image_path === '/images/gear-wrench.png' && 'w-[75%]'}`} />
+                    </div>
                     <CardTitle>{title}</CardTitle>
                 </CardHeader>
                 <CardContent>

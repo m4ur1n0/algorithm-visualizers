@@ -15,6 +15,7 @@ export const GridProvider = ({ children }) => {
 
   const appendEnd = (newEnd) => {
     setEnds([...ends, newEnd]);
+    console.log(ends);
   }
 
   const removeEnd = (end) => {
@@ -143,6 +144,8 @@ export const GridProvider = ({ children }) => {
     if (gridVals[y][x].type!==4) { // can't set end as start :/
       appendEnd({x, y});
       updateCellType(x, y, 5);
+      setSelectorMode({func : setCellWall});
+
     }
     
   }

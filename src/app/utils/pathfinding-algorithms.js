@@ -183,6 +183,7 @@ function getClosestEnd(x, y, endList) {
 
     for(const coord of endList) {
         const dist = getSquareDist(x, y, coord.x, coord.y);
+        console.log(`considering (${coord.x},${coord.y}) : ${dist}`);
         if (dist < closest) {
             closestCoord = coord;
             closest = dist;
@@ -270,20 +271,47 @@ export const a_star = async (grid, start_x, start_y, setVisited, setPath, endLis
 
         console.log('a*');
 
+        // const directions = [ // don't want to include diagonals because paths should be real
+        //     {
+        //         dx : 0, dy : -1 // up
+        //     },
+        //     {
+        //         dx : 0, dy : 1 // down
+        //     },
+        //     {
+        //         dx : -1, dy : 0 // left
+        //     },
+        //     {
+        //         dx : 1, dy : 0 // right
+        //     }
+        // ]
+
         const directions = [ // don't want to include diagonals because paths should be real
+            {
+                dx : -1, dy : -1 // upleft
+            },
             {
                 dx : 0, dy : -1 // up
             },
             {
-                dx : 0, dy : 1 // down
+                dx : 1, dy : -1 // upright
             },
             {
                 dx : -1, dy : 0 // left
             },
             {
                 dx : 1, dy : 0 // right
-            }
-        ]
+            },
+            {
+                dx : -1, dy : 1 // downleft
+            },
+            {
+                dx : 0, dy : 1 // down
+            },
+            {
+                dx : 1, dy : 1 // downright
+            },
+        ] 
 
         const seekingEnd = getClosestEnd(start_x, start_y, endList);
 
