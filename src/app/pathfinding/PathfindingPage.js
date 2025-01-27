@@ -89,7 +89,7 @@ export default function PathfindingPage() {
           }
         </div>
         <div className='control-panel-body flex flex-col w-full'>
-            <Select onValueChange={(val) => {if(val==='astar'){alert("NOTE: A* prefers to be able to move diagonally, this implementation has not yet been optimized to find the best path WITHOUT diagonal movement, the way A* prefers.")} setAlgorithm(val)}}>
+            <Select onValueChange={(val) => {if(val==='astar'){alert("NOTE: A* wants to move DIAGONALLY -- reflect this with your wall palcement.")} setAlgorithm(val)}}>
               <SelectTrigger className='my-5'>
                 <SelectValue placeholder='Select an algorithm...' />
               </SelectTrigger>
