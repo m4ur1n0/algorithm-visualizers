@@ -422,6 +422,168 @@ export const a_star = async (grid, start_x, start_y, setVisited, setPath, endLis
 
 }
 
+export const a_star_manhattan = async (grid, start_x, start_y, setVisited, setPath, endList, stopper) => {
+
+    // needs endList format : [{x, y}, {x, y}... etc]
+
+    try {
+        if(!start_x || !start_y || !grid || !setVisited || !setPath) {
+            return [];
+        }
+
+        console.log('a*');
+
+        const directions = [ // don't want to include diagonals because paths should be real
+            {
+                dx : 0, dy : -1 // up
+            },
+            {
+                dx : 0, dy : 1 // down
+            },
+            {
+                dx : -1, dy : 0 // left
+            },
+            {
+                dx : 1, dy : 0 // right
+            }
+        ]
+
+        // const directions = [ // don't want to include diagonals because paths should be real
+        //     {
+        //         dx : -1, dy : -1 // upleft
+        //     },
+        //     {
+        //         dx : 0, dy : -1 // up
+        //     },
+        //     {
+        //         dx : 1, dy : -1 // upright
+        //     },
+        //     {
+        //         dx : -1, dy : 0 // left
+        //     },
+        //     {
+        //         dx : 1, dy : 0 // right
+        //     },
+        //     {
+        //         dx : -1, dy : 1 // downleft
+        //     },
+        //     {
+        //         dx : 0, dy : 1 // down
+        //     },
+        //     {
+        //         dx : 1, dy : 1 // downright
+        //     },
+        // ] 
+
+        const seekingEnd = getClosestEnd(start_x, start_y, endList);
+
+        const endX = seekingEnd.x;
+        const endY = seekingEnd.y;
+
+        let g = 0; // distance -- between currNode and startNode
+        let h = getSquareDist(start_x, start_y, endX, endY); // heuristic -- squared distance between currNoode and endNode
+        let f = g + h; // cost -- g + h
+
+        const startKey = `${start_x},${start_y}`;
+
+        let openList = [{x : start_x, y : start_y, f, g, h}];
+        let parents = {
+            [startKey] : 0,
+        }
+        let closedList = [];
+
+        
+        while (true) {
+
+            if (stopper.shouldStop) {
+                console.log("stopping?");
+                return [];
+            }
+
+            // consider node with lowest f in open list
+            if (openList.length === 0) {
+                // console.log("No path found");
+                return [];
+            }
+
+            
+            const lowestFCell = openList.pop();
+            // console.log(`lowest f cell : ${JSON.stringify(lowestFCell)}`);
+
+            if(grid[lowestFCell.y][lowestFCell.x].type===5) {
+                // if we have found the end, return
+                return traverse_parents(parents, lowestFCell)
+            }
+
+            closedList.push(lowestFCell);
+            const promises = [];
+
+            // console.log(`traversing neighbors of ${JSON.stringify(lowestFCell)}`)
+            for(const {dx, dy} of directions) {
+                const nextCell = {x : lowestFCell.x + dx, y : lowestFCell.y + dy};
+                if (
+                    nextCell.x < 0 || nextCell.x >= grid[0].length ||
+                    nextCell.y < 0 || nextCell.y >= grid.length
+                ) {
+                    continue;
+                }
+                const cellKey = `${nextCell.x},${nextCell.y}`;
+                const parent = parents[cellKey];
+
+                // console.log("getting here");
+                let g;
+                if (parent===0 || parent===undefined) {
+                    g = 1;
+                } else {
+                    g = parent.g + 1;
+                }
+                // console.log("also getting here");
+
+
+                let h = getSquareDist(nextCell.x, nextCell.y, endX, endY);
+                let f = g + h;
+
+                const type = grid[nextCell.y][nextCell.x].type;
+
+                if(type === 0 || type === 5) {
+                    const versionInClosedList = search_open_list(closedList, nextCell);
+                    if (versionInClosedList === null) {
+                        const versionInOpenList = search_open_list(openList, nextCell);
+                        if (versionInOpenList === null || versionInOpenList.g > g) {
+                            // then we are actually considering it --
+                            promises.push(setVisited(nextCell.x, nextCell.y))
+                            openList = remove_cell_from_array(openList, versionInOpenList);
+
+                            openList = insertIntoPriQ(openList, {
+                                x: nextCell.x,
+                                y: nextCell.y,
+                                f,
+                                g,
+                                h
+                            });
+                            const key=`${nextCell.x},${nextCell.y}`;
+                            parents[key] = lowestFCell;
+                        }
+                    }
+                }
+
+            }
+
+            await Promise.all(promises);
+
+            
+
+        }
+
+
+
+    } catch (err) {
+        console.log("error ocurred during a* pathfinding", err);
+        return [];
+    }
+
+}
+
 function get_direction() {
     const directions = [ // don't want to include diagonals because paths should be real
         {

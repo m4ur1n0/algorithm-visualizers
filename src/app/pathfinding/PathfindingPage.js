@@ -4,7 +4,7 @@ import { useEffect, useState, useRef } from 'react';
 import PathfinderGrid from '@/components/PathfinderGrid';
 import { GridProvider, useGridContext } from '@/context/GridContext';
 import { Button } from '@/components/ui/button';
-import { bfs, dfs, a_star, random_walk } from '../utils/pathfinding-algorithms';
+import { bfs, dfs, a_star, a_star_manhattan, random_walk } from '../utils/pathfinding-algorithms';
 import {
   Select,
   SelectContent,
@@ -14,6 +14,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { 
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+ } from '@/components/ui/dialog';
 
 const delay = async (ms) => {
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -24,7 +33,8 @@ export default function PathfindingPage() {
 
 
   const {initializeGrid, setCellWall, gridVals, ends, startPlaced, selectorMode, setModeToWall, setModeToStart, setModeToEnd, setModeToBlank, setCellViewed, setCellPath, setCellBlank, algorithm, setAlgorithm} = useGridContext();
-  const [algoRunning, setAlgoRunning] = useState(false);
+  const [algoRunning, setAlgoRunning] = useState(0); // 0 = not running, clear ; 1 = running ; 2 = not running ran, not clear
+  const [dialogIsOpen, setDialogIsOpen] = useState(false);
   // const [preempter, setPreempter] = useState(false); // on true -- algorithm stops
   const preempter = useRef({shouldStop : false});
 
@@ -38,36 +48,115 @@ export default function PathfindingPage() {
     'bfs' : bfs,
     'dfs' : dfs,
     'astar' : a_star,
+    'astar-manhattan' : a_star_manhattan,
     'randomWalk': random_walk,
   }
 
-  const fix = async () => {
-    await delay(1000);
-    setPreempter(false);
+  
+
+  const handleValChange = (val) => {
+    if(val==='astar') {
+      setDialogIsOpen(true);
+    } 
+    setAlgorithm(val)
   }
 
-  const preempt = async () => {
-    setPreempter(true);
-    // fix();
-  }
-
-  function setMaze() {
-    initializeGrid(48, 32);
-
-    for(const row of gridVals) {
-      for(const cell of row) {
-        const chance = Math.random() * (3); 
-        if(chance > 2) {
-          setCellWall(cell.x, cell.y);
+  function clearViewedAndPath() {
+    for (const row of gridVals) {
+      for (const cell of row) {
+        if (cell.type === 1 || cell.type === 2) {
+          setCellBlank(cell.x, cell.y);
         }
       }
     }
   }
+
+  function clearViewedWallsAndPath() {
+    for (const row of gridVals) {
+      for (const cell of row) {
+        if (cell.type === 1 || cell.type === 2 || cell.type === 3) {
+          setCellBlank(cell.x, cell.y);
+        }
+      }
+    }
+  }
+
+  function setMaze() {
+    if (algoRunning === 1) {
+      return; // do nothing when algorithm is running
+    }
+
+    clearViewedWallsAndPath();
+
+    for(const row of gridVals) {
+      for(const cell of row) {
+        const chance = Math.random() * (3); 
+        if(chance > 2 && cell.type !== 4 && cell.type !== 5) { // avoid overwriting start and ends
+          setCellWall(cell.x, cell.y);
+        }
+      }
+    }
+
+    setAlgoRunning(0); // this accomplishes a reset!
+  }
+
+  const handleRunClick = async () => {
+    if (algoRunning === 2) {
+      // then this button is in 'reset path' mode
+      clearViewedAndPath();
+      setAlgoRunning(0);
+      return;
+    }
+
+    if (!startPlaced || !algorithm) {
+      return;
+    }
+
+    if (algoRunning === 1) {
+      // if the algorithm is literally currently running, run should do nothing, we have a stop button for this reason
+      return;
+    }
+
+    // Initialize preempter
+    // preempter.current.shouldStop = true;
+
+    // await delay(500); // delay for 500 to make sure it rly stops
+
+    preempter.current.shouldStop = false;
+
+    // Clear previous paths and viewed cells
+    clearViewedAndPath();
+
+    setAlgoRunning(1);
+
+    // Start the algorithm
+    algorithms[algorithm](gridVals, startPlaced.x, startPlaced.y, setCellViewed, setCellPath, ends, preempter.current).then(async (path) => {
+      if (preempter.shouldStop || !path) {
+        setAlgoRunning(2); // algo no longer running, but not reset
+        return;
+      }
+      
+      console.log(path);
+      for (const coord of path) {
+        await setCellPath(coord.x, coord.y);
+      }
+      setAlgoRunning(2); // algorithm has run, requires resetting
+    });
+  }
   
+  const runButtonText = ["Run", "running...", "Reset Path"];
 
 
   return (
     <div className="full-pathfinding-page w-screen h-screen p-4 flex flex-row justify-center gap-5 items-center">
+      <Dialog open={dialogIsOpen} onOpenChange={setDialogIsOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>A☆ Search Algorithm </DialogTitle>
+          </DialogHeader>
+          <p>The A☆ search algorithm has the capacity to move diagonally, not just up, down, left, right. Reflect this in your wall placement, as it will sneak through corners you don't expect.<br/><br/>If you want to see A☆ in action without diagonals, select <span className='font-bold'>A☆ (No Diagonal)</span> instead.</p>
+        </DialogContent>
+      </Dialog>
 
       <div className="pathfinding-graph-section overflow-auto w-[70%] h-full flex flex-col p-2 justify-center items-center border border-gray-300 rounded-lg shadow-inner">
         <PathfinderGrid/>
@@ -78,18 +167,19 @@ export default function PathfindingPage() {
         <div className="control-panel-title flex flex-row items-center w-full h-[10%]">
           <h1>Controls</h1>
           {
-            true &&
+            // only if algorithm actively running
+            (algoRunning === 1) && 
             <Button
-              className='rounded-full scale-[0.8] ml-56'
+              className='rounded-full scale-[0.8] h-[44px] w-[44px] ml-56 mb-2'
               variant="destructive"
-              onClick={() => {preempter.current.shouldStop = true; setAlgoRunning(false);}}
+              onClick={() => {preempter.current.shouldStop = true; setAlgoRunning(2);}} // preemption happens mid-run, algo must be reset
             >
               <div className='bg-white w-[12px] h-[12px]' />
             </Button>
           }
         </div>
         <div className='control-panel-body flex flex-col w-full'>
-            <Select onValueChange={(val) => {if(val==='astar'){alert("NOTE: A* wants to move DIAGONALLY -- reflect this with your wall palcement.")} setAlgorithm(val)}}>
+            <Select onValueChange={(val) => {handleValChange(val)}}>
               <SelectTrigger className='my-5'>
                 <SelectValue placeholder='Select an algorithm...' />
               </SelectTrigger>
@@ -99,22 +189,23 @@ export default function PathfindingPage() {
                   <SelectItem value='bfs'>Breadth First Search</SelectItem>
                   <SelectItem value='dfs'>Depth First Search</SelectItem>
                   <SelectItem value='astar'>A☆</SelectItem>
+                  <SelectItem value='astar-manhattan'>A☆ (No Diagonal)</SelectItem>
                   <SelectItem value='randomWalk'>Random Walk (no revisit)</SelectItem>
 
                 </SelectGroup>
               </SelectContent>
             </Select>
-          <div className='mt-5 flex flex-row gap-4 w-full'>
+          <div className='mt-5 flex flex-row gap-4 w-2/3'>
             
             <Button
-              className=''
+              className='w-full'
               variant="secondary"
               onClick={setModeToStart}
             >
               Set Start
             </Button>
             <Button
-              className=''
+              className='w-full'
               variant="secondary"
               onClick={setModeToEnd}
             >
@@ -122,26 +213,26 @@ export default function PathfindingPage() {
             </Button>
           </div>
 
-          <div className='flex flex-col'>
+          <div className='flex flex-col gap-1'>
             <Button
-              className='mt-5 w-1/3'
+              className='mt-5 w-2/3'
               variant='secondary'
               onClick={setModeToWall}
             >
-              Wall
+              Wall Mode
             </Button>
             <Button
-              className='mt-1 w-1/3'
+              className='mt-1 w-2/3'
               variant='secondary'
               onClick={setModeToBlank}
             >
-              Eraser
+              Eraser Mode
             </Button>
 
             <Button
               className='mt-24 w-full'
               variant='outline'
-              onClick={() => initializeGrid(48, 32)}
+              onClick={() => {initializeGrid(48, 32); setAlgoRunning(0);}}
             >
               Clear
             </Button>
@@ -149,41 +240,9 @@ export default function PathfindingPage() {
             <Button
               className={`mt-5 w-full bg-gray-900 text-white ${!algoRunning && 'hover:bg-gray-600'}`}
               variant={algoRunning ? 'loading' : 'secondary'}
-              onClick={async () => {
-                if (!startPlaced || !algorithm) {
-                  return;
-                }
-
-                // Initialize preempter
-                preempter.current.shouldStop = false;
-
-                // Clear previous paths and viewed cells
-                for (const row of gridVals) {
-                  for (const cell of row) {
-                    if (cell.type === 1 || cell.type === 2) {
-                      setCellBlank(cell.x, cell.y);
-                    }
-                  }
-                }
-
-                setAlgoRunning(true);
-
-                // Start the algorithm
-                algorithms[algorithm](gridVals, startPlaced.x, startPlaced.y, setCellViewed, setCellPath, ends, preempter.current).then(async (path) => {
-                  if (preempter.shouldStop || !path) {
-                    setAlgoRunning(false); // Ensure the state is reset
-                    return;
-                  }
-                  
-                  console.log(path);
-                  for (const coord of path) {
-                    await setCellPath(coord.x, coord.y);
-                  }
-                  setAlgoRunning(false);
-                });
-              }}
+              onClick={handleRunClick}
             >
-              {algoRunning ? "running..." : "RUN"}
+              {runButtonText[algoRunning]}
             </Button>
 
 
