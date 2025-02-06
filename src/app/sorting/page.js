@@ -1,9 +1,12 @@
+import { SortingProvider } from '@/context/SortingContext'
 import React from 'react'
 import SortingPage from './SortingPage'
 
 const page = () => {
   return (
-    <SortingPage />
+    <SortingProvider>
+      <SortingPage />
+    </SortingProvider>
   )
 }
 

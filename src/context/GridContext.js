@@ -1,6 +1,5 @@
 // context/GridContext.js
-import { ChartNoAxesColumnDecreasingIcon } from "lucide-react";
-import React, { createContext, useContext, useState, useCallback, useEffect } from "react";
+import React, { createContext, useContext, useState, useCallback } from "react";
 
 const GridContext = createContext();
 
