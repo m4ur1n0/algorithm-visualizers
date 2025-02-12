@@ -19,9 +19,9 @@ const IndivSortingBar = ({value, position}) => {
 
   let percentage_taken_up_by_bars = width_unit * num_bars;
   let additional_padding = (total_available_width - percentage_taken_up_by_bars) / 2;
-  console.log(`bars : ${percentage_taken_up_by_bars}  -  addit padding : ${additional_padding}`);
+  // console.log(`bars : ${percentage_taken_up_by_bars}  -  addit padding : ${additional_padding}`);
 
-  console.log(width_unit);
+  // console.log(width_unit);
   let total_padding = padding + additional_padding;
 
   let leftPercent = ((position) * (width_unit)) + total_padding;

@@ -24,13 +24,34 @@ export const SortingProvider = ({children}) => {
     }
 
     function swapPositions(idx1, idx2) {
-        if (idx1 !== idx2) {
+
+        return new Promise((resolve) => {
+            // check indices' validity
+            if (
+                typeof idx1 !== 'number' || typeof idx2 !== 'number' || !Number.isInteger(idx1) || !Number.isInteger(idx2) || idx1 < 0 || idx2 < 0 || idx1 > positions.length || idx2 > positions.length
+            ) {
+                console.error(`Invalid indices provided to swapPositions : [ ${idx1} , ${idx2} ] for length ${positions.length}`);
+                resolve(); // complete promise
+                return;
+            } else if (idx1 === idx2) {
+                console.log("trivial call to swapPositions()");
+                resolve();
+                return;
+            }
+
+
+            // update state
             setPositions(prev => {
+                // swap positions
                 const newPositions = [...prev];
+                // console.log(`actually swapping ${idx1} with ${idx2}`);
                 [newPositions[idx1], newPositions[idx2]] = [newPositions[idx2], newPositions[idx1]];
+                
+                resolve(newPositions); // resolve with the new state (i.e. awaiting promise resolves to this?);
                 return newPositions;
             });
-        }
+        });
+
     }
 
 
