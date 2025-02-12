@@ -1,5 +1,5 @@
 import { useSortingContext } from '@/context/SortingContext';
-import React from 'react'
+import React, {useEffect} from 'react'
 
 const IndivSortingBar = ({value, position}) => {
   
@@ -34,14 +34,14 @@ const IndivSortingBar = ({value, position}) => {
             {
                 width : `${width_unit}%`,
                 // maxWidth : '8%',
-                height : `${height_unit * value}%`,
+                height : `${height_unit * (value + 1)}%`, // need to account for 0 indexing!!!
                 left : `${leftPercent}%`,
                 transition : `left 0.5s ease-in-out`,
 
             }
         }
     >
-       
+      
     </div>
   )
 }

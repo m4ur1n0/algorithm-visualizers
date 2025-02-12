@@ -1,12 +1,16 @@
+import { useSortingContext } from '@/context/SortingContext'
 import React from 'react'
 import IndivSortingBar from './IndivSortingBar'
 
-const SortingBars = ({values_array, positions}) => {
+const SortingBars = () => {
+
+  const {positions, barValues} = useSortingContext();
+
   return (
       <div className='bars-row relative h-full w-full'>
           {
-              values_array.map((value_obj, idx) => {
-                return (<IndivSortingBar key={idx} value={value_obj.value} position={positions[idx]} />)
+              barValues.map((val, idx) => {
+                return (<IndivSortingBar key={idx} value={val} position={positions[idx]} />)
               })
           }
         

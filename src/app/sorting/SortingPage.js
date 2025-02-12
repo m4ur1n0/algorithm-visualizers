@@ -3,12 +3,12 @@
 
 import SortingBarGraph from '@/components/SortingBarGraph'
 import SortingControls from '@/components/SortingControls';
-import { useSortingContext } from '@/context/SortingContext';
+// import { useSortingContext } from '@/context/SortingContext';
 import React from 'react'
 
 const SortingPage = () => {
 
-  const {positions, barValues, swapPositions} = useSortingContext();
+  // const {positions, barValues, swapPositions} = useSortingContext();
 
     
   

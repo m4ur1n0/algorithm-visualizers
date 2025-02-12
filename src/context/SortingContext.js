@@ -6,22 +6,57 @@ const SortingContext = createContext();
 
 export const SortingProvider = ({children}) => {
 
-    const size = 15;
+    const size = 30;
 
     // DEAL WITH POSITIONS -- THE ACTUAL RENDERERS
     const [positions, setPositions] = useState(Array.from({length : size}, (_, i) => i));
 
-    function pushPosition() {
-        setPositions(prev => {
-            let x = prev.length;
-            return [...prev, x];
-        })
-    }
+    // function pushPosition() {
+    //     setPositions(prev => {
+    //         let x = prev.length;
+    //         return [...prev, x];
+    //     })
+    // }
 
     function setNumPositions(amount) {
         const newArr = Array.from({length : amount}, (_, i) => i); /// positions will start from 0 though values should start from one 
         setPositions(newArr);
     }
+
+    
+
+
+    // DEAL WITH BAR VALUES -- MIGHT BE USEFUL LATER
+    const [barValues, setBarValues] = useState(Array.from({length : size}, (_, k) => k));
+
+
+    // function pushBarValue(value) {
+    //     setBarValues(prev => {
+    //         return [...prev, value];
+    //     })
+    //     // push another position as well
+    //     pushPosition();
+    // }
+
+    function setNumBars(amount) {
+        const newArr = Array.from({length : amount}, (_, k) => k);
+        setBarValues(newArr);
+        // set number of positions as well.
+        
+
+    }
+
+
+    // general -- modify both
+    function setNum(amount) {
+        setNumBars(amount);
+        setNumPositions(amount);
+    }
+
+    const delay = async (ms) => {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
 
     function swapPositions(idx1, idx2) {
 
@@ -40,55 +75,32 @@ export const SortingProvider = ({children}) => {
             }
 
 
-            // update state
-            setPositions(prev => {
-                // swap positions
-                const newPositions = [...prev];
-                // console.log(`actually swapping ${idx1} with ${idx2}`);
+            setPositions((prevPositions) => {
+                const newPositions = [...prevPositions];
                 [newPositions[idx1], newPositions[idx2]] = [newPositions[idx2], newPositions[idx1]];
-                
-                resolve(newPositions); // resolve with the new state (i.e. awaiting promise resolves to this?);
+    
+                // Update barValues based on the new positions
+                setBarValues((prevBarValues) => {
+                    const newBarValues = [...prevBarValues];
+                    [newBarValues[idx1], newBarValues[idx2]] = [newBarValues[idx2], newBarValues[idx1]];
+    
+                    // Resolve the promise with the new positions
+                    return newBarValues;
+                });
                 return newPositions;
             });
+
+            resolve();
+
         });
-
     }
-
-
-    // DEAL WITH BAR VALUES -- MIGHT BE USEFUL LATER
-    const [barValues, setBarValues] = useState(Array.from({length : size}, (_, k) => ({value : k + 1})));
-
-
-    function pushBarValue(value) {
-        setBarValues(prev => {
-            return [...prev, {value}];
-        })
-        // push another position as well
-        pushPosition();
-    }
-
-    function setNumBars(amount) {
-        const newArr = Array.from({length : amount}, (_, k) => ({value : k + 1}));
-        setBarValues(newArr);
-        // set number of positions as well.
-        
-
-    }
-
-    const delay = async (ms) => {
-        return new Promise(resolve => setTimeout(resolve, ms));
-    }
-
 
     const value = {
         delay,
         positions,
-        setNumPositions,
-        pushPosition,
         swapPositions,
-        setNumBars,
-        pushBarValue,
         barValues,
+        setNum
 
 
     }

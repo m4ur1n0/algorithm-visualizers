@@ -42,7 +42,8 @@ function SortingControls() {
 
             {/* <Button className='' variant='secondary' onClick={switchTwo}>Swap</Button> */}
             <Button className='' variant='secondary' onClick={() => randomize(positions, swapPositions)}>Randomize</Button>
-            <Button className='' variant='primary' onClick={() => selectionSort(positions, barValues, swapPositions)}>Selection Sort</Button>
+            <Button className='' variant='primary' onClick={() => selectionSort(positions, swapPositions)}>Selection Sort</Button>
+            {/* <Button className='' variant='primary' onClick={() => console.log(`vals : ${JSON.stringify(barValues)}\nposi : ${JSON.stringify(positions)}`)}>print</Button> */}
 
 
             {/* SELECT ALGORITHM DROPDOWN */}
