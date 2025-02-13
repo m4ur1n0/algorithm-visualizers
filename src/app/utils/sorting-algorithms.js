@@ -1,46 +1,28 @@
 
-// export async function selectionSort(barPositions, swapTwo) {
-
-//     // trivial sort algorithm
-
-//     console.log(`receiving bar values : ${JSON.stringify(barValues)}`);
-
-//     let minIndex = -1;
-//     let minVal = 999;
-//     const len = barPositions.length;
-
-//     for (let iteration = 0; iteration < len; iteration++) {
-//         let primaryIdx = barPositions[iteration];
-//         let index = iteration;
-
-//         minIndex = barPositions[iteration];
-//         minVal = barValues[primaryIdx]["value"];
-
-//         for (index = iteration + 1; index < len; index++) {
-//             let actualIdx = barPositions[index];
-//             console.log(`looking at bar value : ${JSON.stringify(barValues[actualIdx])}`)
-//             let currVal = barValues[actualIdx]["value"];
-//             if (currVal < minVal) {
-//                 minVal = currVal;
-//                 minIndex = actualIdx;
-//             }
-//         }
-
-//         if (minIndex !== iteration) { // i.e. if we have found someone to swap buddy with
-//             await swapTwo(iteration, index);
-//             console.log(`attempted to swap [${iteration}] with [${index}]`);
-//         }
-        
-        
-
-//     }
-
-//     console.log(`POSITIONS AT END : ${JSON.stringify(barPositions)}\nVALUES AT END : ${JSON.stringify(barValues)}`);
-
-// }
-
 const delay = async (ms) => {
     return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+export async function bubbleSort(positions, swapTwo) {
+    const n = positions.length;
+    let localPos = [...positions];
+    const ideal = Array.from({length : n}, (_, k) => k)
+
+    while (JSON.stringify(localPos) !== JSON.stringify(ideal)) {
+        for (let i = 0; i < n - 1; i++) {
+
+            if (localPos[i] > localPos[i+1]) {
+                // then just hit the swapski
+                [localPos[i], localPos[i + 1]] = [localPos[i + 1], localPos[i]];
+
+                await delay(400);
+                swapTwo(i, i + 1);
+                await delay(250);
+            }
+
+        }
+    }
+
 }
 
 export async function selectionSort(positions, swapTwo) {
@@ -84,6 +66,7 @@ export async function selectionSort(positions, swapTwo) {
 
     
 }
+
 
 
 export async function randomize(barPositions, swapTwo) {

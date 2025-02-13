@@ -2,7 +2,7 @@ import { useSortingContext } from '@/context/SortingContext';
 import { Button } from './ui/button';
 import React, { useRef, useState } from 'react'
 
-import { randomize, selectionSort } from '@/app/utils/sorting-algorithms';
+import { randomize, selectionSort, bubbleSort } from '@/app/utils/sorting-algorithms';
 
 function SortingControls() {
 
@@ -33,7 +33,18 @@ function SortingControls() {
 
             {/* <Button className='' variant='secondary' onClick={switchTwo}>Swap</Button> */}
             <Button className='mx-2' variant='secondary' onClick={() => randomize(positions, swapPositions)}>Randomize</Button>
-            <Button className='mx-2' variant='primary' onClick={() => selectionSort(positions, swapPositions)}>Selection Sort</Button>
+            <Button className='mx-2' variant='primary' onClick={async () => {
+                setAlgoRunning();
+                await selectionSort(positions, swapPositions);
+                setAlgoSorted();
+            }}>Selection Sort</Button>
+
+            <Button className='mx-2' variant='primary' onClick={async () => {
+                setAlgoRunning();
+                await bubbleSort(positions, swapPositions);
+                setAlgoSorted();
+            }}>Bubble Sort</Button>
+
             <Button className='mx-2' variant='primary' onClick={() => console.log(`vals : ${JSON.stringify(barValues)}\nposi : ${JSON.stringify(positions)}`)}>print</Button>
             <Button className='mx-2' variant="secondary" onClick={() => {setAlgoRunning()}}>running</Button>
             <Button className='mx-2' variant="secondary" onClick={() => {setAlgoUnsorted()}}>at mess</Button>
