@@ -79,14 +79,14 @@ export const SortingProvider = ({children}) => {
                 const newPositions = [...prevPositions];
                 [newPositions[idx1], newPositions[idx2]] = [newPositions[idx2], newPositions[idx1]];
     
-                // Update barValues based on the new positions
-                setBarValues((prevBarValues) => {
-                    const newBarValues = [...prevBarValues];
-                    [newBarValues[idx1], newBarValues[idx2]] = [newBarValues[idx2], newBarValues[idx1]];
+                // // Update barValues based on the new positions
+                // setBarValues((prevBarValues) => {
+                //     const newBarValues = [...prevBarValues];
+                //     [newBarValues[idx1], newBarValues[idx2]] = [newBarValues[idx2], newBarValues[idx1]];
     
-                    // Resolve the promise with the new positions
-                    return newBarValues;
-                });
+                //     // Resolve the promise with the new positions
+                //     return newBarValues;
+                // });
                 return newPositions;
             });
 
