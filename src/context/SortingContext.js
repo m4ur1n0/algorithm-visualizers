@@ -95,12 +95,35 @@ export const SortingProvider = ({children}) => {
         });
     }
 
+    // ALGORITHM STATE
+    // 0 = at rest, fully sorted, 
+    // 1 = at rest, unsorted, 
+    // 2 = currently running
+    const [algoState, setAlgoState] = useState(0);
+
+    function setAlgoRunning() {
+        setAlgoState(2);
+    }
+
+    function setAlgoSorted() {
+        setAlgoState(0);
+    }
+
+    function setAlgoUnsorted() {
+        setAlgoState(1);
+    }
+
+
     const value = {
         delay,
         positions,
         swapPositions,
         barValues,
-        setNum
+        setNum,
+        algoState,
+        setAlgoSorted,
+        setAlgoUnsorted,
+        setAlgoRunning,
 
 
     }
