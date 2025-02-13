@@ -34,7 +34,7 @@ function SortingControls() {
             {/* <Button className='' variant='secondary' onClick={switchTwo}>Swap</Button> */}
             <Button className='mx-2' variant='secondary' onClick={() => randomize(positions, swapPositions)}>Randomize</Button>
             <Button className='mx-2' variant='primary' onClick={() => selectionSort(positions, swapPositions)}>Selection Sort</Button>
-            {/* <Button className='mx-2' variant='primary' onClick={() => console.log(`vals : ${JSON.stringify(barValues)}\nposi : ${JSON.stringify(positions)}`)}>print</Button> */}
+            <Button className='mx-2' variant='primary' onClick={() => console.log(`vals : ${JSON.stringify(barValues)}\nposi : ${JSON.stringify(positions)}`)}>print</Button>
             <Button className='mx-2' variant="secondary" onClick={() => {setAlgoRunning()}}>running</Button>
             <Button className='mx-2' variant="secondary" onClick={() => {setAlgoUnsorted()}}>at mess</Button>
             <Button className='mx-2' variant="secondary" onClick={() => {setAlgoSorted()}}>at rest</Button>
