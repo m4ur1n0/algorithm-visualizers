@@ -13,7 +13,7 @@ const SortingBarGraph = () => {
     const algoRunningShadowColorHigh = `inset 0 0 40px rgba(147, 196, 253, 0.8)`;
     const algoRunningShadowColorLow = `inset 0 0 20px rgba(147, 196, 253, 0.8)`;
 
-    const algoAtUnsortedShadowColor = `inset 0 0 30px rgba(235, 80, 80, 0.5)`;
+    const algoAtUnsortedShadowColor = `inset 0 0 40px rgba(235, 80, 80, 0.6)`;
 
     const algoSortedShadowColorHigh = `inset 0 0 60px rgba(36, 189, 54, 0.7)`;
     const algoSortedShadowColorLow = `inset 0 0 30px rgba(42, 219, 63, 0.7)`;

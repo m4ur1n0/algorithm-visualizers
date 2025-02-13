@@ -86,7 +86,7 @@ export async function selectionSort(positions, swapTwo) {
 }
 
 
-export function randomize(barPositions, swapTwo) {
+export async function randomize(barPositions, swapTwo) {
 
     const len = barPositions.length;
 
@@ -94,7 +94,7 @@ export function randomize(barPositions, swapTwo) {
         let i = Math.floor(Math.random() * (len - 1));
         let j = Math.floor(Math.random() * (len - 1));
 
-        swapTwo(i, j);
+        await swapTwo(i, j);
     }
 
 }
