@@ -4,20 +4,30 @@ const delay = async (ms) => {
 }
 
 export async function bubbleSort(positions, swapTwo) {
+    // every index of position (0, 1, 2...) is actually represents where each value is
+    // so positions[3] returns the index in the list of bars where the bar of value 3 is actually found.
+    // so the goal is actually to sort by comparing indices of i and i+1
+    // i.e. the actual bar value at any point in positions is positions.indexOf(i) (if i == 4, it will return the number where 4 is located on the bar graph)
+        // if positions.indexOf(i)
+
     const n = positions.length;
     let localPos = [...positions];
     const ideal = Array.from({length : n}, (_, k) => k)
 
     while (JSON.stringify(localPos) !== JSON.stringify(ideal)) {
         for (let i = 0; i < n - 1; i++) {
+            let j = localPos.indexOf(i);
+            let k = localPos.indexOf(i + 1);
 
-            if (localPos[i] > localPos[i+1]) {
+            if (j > k) {
                 // then just hit the swapski
-                [localPos[i], localPos[i + 1]] = [localPos[i + 1], localPos[i]];
 
                 await delay(400);
-                swapTwo(i, i + 1);
+                await swapTwo(j, k);
                 await delay(250);
+
+                [ localPos[j], localPos[k] ] = [ localPos[k], localPos[j] ];
+
             }
 
         }

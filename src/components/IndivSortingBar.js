@@ -14,7 +14,7 @@ const IndivSortingBar = ({value, position}) => {
   let height_unit = max_available_height / num_bars;
   if (height_unit < 1) height_unit = 1;  
   let width_unit = Math.floor(total_available_width / num_bars);
-  if (width_unit < 1) width_unit = 1;
+  // if (width_unit < 1) width_unit = 1;
   if (width_unit > 20) width_unit = 20;
 
   let percentage_taken_up_by_bars = width_unit * num_bars;
@@ -32,6 +32,7 @@ const IndivSortingBar = ({value, position}) => {
         className={`individual-graph-bar bg-light_blue absolute bottom-20 border-4  border-background`}
         style={
             {
+              
                 width : `${width_unit}%`,
                 // maxWidth : '8%',
                 height : `${height_unit * (value + 1)}%`, // need to account for 0 indexing!!!

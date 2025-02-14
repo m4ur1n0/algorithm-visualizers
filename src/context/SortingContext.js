@@ -39,10 +39,11 @@ export const SortingProvider = ({children}) => {
     // }
 
     function setNumBars(amount) {
+
         const newArr = Array.from({length : amount}, (_, k) => k);
         setBarValues(newArr);
         // set number of positions as well.
-        
+    
 
     }
 
@@ -59,6 +60,8 @@ export const SortingProvider = ({children}) => {
 
 
     function swapPositions(idx1, idx2) {
+
+        console.log(`about to swap idx ${idx1} with idx ${idx2} in list ${JSON.stringify(positions)}`);
 
         return new Promise((resolve) => {
             // check indices' validity
@@ -77,6 +80,7 @@ export const SortingProvider = ({children}) => {
 
             setPositions((prevPositions) => {
                 const newPositions = [...prevPositions];
+                console.log(`i think prev positions are ${JSON.stringify(newPositions)}`);
                 [newPositions[idx1], newPositions[idx2]] = [newPositions[idx2], newPositions[idx1]];
     
                 // // Update barValues based on the new positions
@@ -87,6 +91,9 @@ export const SortingProvider = ({children}) => {
                 //     // Resolve the promise with the new positions
                 //     return newBarValues;
                 // });
+
+                console.log(`i am setting new positions as : ${JSON.stringify(newPositions)}`);
+
                 return newPositions;
             });
 
