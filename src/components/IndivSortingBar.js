@@ -29,7 +29,7 @@ const IndivSortingBar = ({value, position}) => {
 
   return (
     <div 
-        className={`individual-graph-bar bg-light_blue absolute bottom-20 border-4  border-background`}
+        className={`individual-graph-bar bg-light_blue absolute bottom-20 border-4  border-background `}
         style={
             {
               
