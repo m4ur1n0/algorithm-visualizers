@@ -11,14 +11,15 @@ function SortingControls() {
 
     const { positions, swapPositions, barValues, algoState, setAlgoUnsorted, setAlgoSorted, setAlgoRunning, setNum} = useSortingContext();
     const [selectedAlgo, setSelectedAlgo] = useState('none');
+    const preempter = useRef({ shouldStop: false });
+
 
     const algorithmMenu = {
         "none" : NoAlgSelected,
-        "selection" : () => selectionSort(positions, swapPositions),
-        "bubble" : () => bubbleSort(positions, swapPositions),
+        "selection" : () => selectionSort(positions, swapPositions, preempter.current),
+        "bubble" : () => bubbleSort(positions, swapPositions, preempter.current),
     }
 
-    const preempter = useRef({ shouldStop: false });
 
     function stopAlgorithm() { 
         preempter.current.shouldStop = true; 
@@ -36,6 +37,7 @@ function SortingControls() {
     }
 
     function handleRunScramble() {
+
         randomize(positions, swapPositions);
         setAlgoUnsorted();
     }
@@ -44,6 +46,7 @@ function SortingControls() {
         
 
         if (selectedAlgo !== "none") {
+            preempter.current.shouldStop = false;
             setAlgoRunning();
             const algo = algorithmMenu[selectedAlgo];
             await algo();
@@ -59,7 +62,7 @@ function SortingControls() {
             {/* SORTING STOP AND TITLE */}
             <div className="control-panel-title flex flex-row items-center w-full h-[10%]">
                 <h1>Controls</h1>
-                {
+                {/* {
                     // only if algorithm actively running
                     (algoState === 2) &&
                     <Button
@@ -68,7 +71,7 @@ function SortingControls() {
                         onClick={stopAlgorithm} 
                     >
                         <div className='bg-white w-[12px] h-[12px]' />
-                    </Button>}
+                    </Button>} */}
             </div>
             
             {/* SELECT ALGORITHM DROPDOWN */}
@@ -93,9 +96,17 @@ function SortingControls() {
 
                 <div className='buttons-column mt-24 flex flex-col w-full gap-2'>
                     <div className='scramble-and-run-buttons flex gap-2'>
-                        <Button onClick={handleRunScramble} className="w-[49%]">Scramble</Button>
-                        <Button onClick={handleRunSort} className="w-[49%]">Run</Button>
+                        <Button onClick={handleRunScramble} disabled={algoState===2} className="w-[49%]">Scramble</Button>
+                        <Button onClick={handleRunSort} disabled={algoState===2} className="w-[49%]">Run</Button>
                     </div>
+
+                    {
+                        algoState === 2
+                        &&
+                        <Button onClick={stopAlgorithm} className="w-full flex items-center justify-center" variant="destructive">
+                            <div className='w-[15px] h-[15px] bg-white' />
+                        </Button>
+                    }
                 </div>
 
 

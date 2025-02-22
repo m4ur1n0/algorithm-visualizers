@@ -3,7 +3,7 @@ const delay = async (ms) => {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-export async function bubbleSort(positions, swapTwo) {
+export async function bubbleSort(positions, swapTwo, preempter) {
     // every index of position (0, 1, 2...) is actually represents where each value is
     // so positions[3] returns the index in the list of bars where the bar of value 3 is actually found.
     // so the goal is actually to sort by comparing indices of i and i+1
@@ -15,7 +15,13 @@ export async function bubbleSort(positions, swapTwo) {
     const ideal = Array.from({length : n}, (_, k) => k)
 
     while (JSON.stringify(localPos) !== JSON.stringify(ideal)) {
+        if (preempter.shouldStop) {
+            return;
+        }
         for (let i = 0; i < n - 1; i++) {
+            if (preempter.shouldStop) {
+                return;
+            }
             let j = localPos.indexOf(i);
             let k = localPos.indexOf(i + 1);
 
@@ -35,7 +41,7 @@ export async function bubbleSort(positions, swapTwo) {
 
 }
 
-export async function selectionSort(positions, swapTwo) {
+export async function selectionSort(positions, swapTwo, preempter) {
     // trivial sort algorithm
     // positions is a list showing index rendered
         // a particular VALUE is at position positions[VALUE];
@@ -46,6 +52,9 @@ export async function selectionSort(positions, swapTwo) {
     let myPositions = [...positions];
 
     for (let iteration = 0; iteration < len; iteration++) {
+        if (preempter.shouldStop) {
+            return;
+        }
         // let iterVal = positions[iteration];
         let iterVal = myPositions[iteration];
 
@@ -55,6 +64,9 @@ export async function selectionSort(positions, swapTwo) {
         let minVal = iterVal;
 
         for (let index = iteration + 1; index < len; index++) {
+            if (preempter.shouldStop) {
+                return;
+            }
             // let currVal = positions[index];
             let currVal = myPositions[index];
 
