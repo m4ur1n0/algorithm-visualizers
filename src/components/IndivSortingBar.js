@@ -13,7 +13,9 @@ const IndivSortingBar = ({value, position}) => {
 
   let height_unit = max_available_height / num_bars;
   if (height_unit < 1) height_unit = 1;  
-  let width_unit = Math.floor(total_available_width / num_bars);
+  // let width_unit = Math.floor(total_available_width / num_bars);
+  let width_unit = total_available_width / num_bars;
+
   // if (width_unit < 1) width_unit = 1;
   if (width_unit > 20) width_unit = 20;
 

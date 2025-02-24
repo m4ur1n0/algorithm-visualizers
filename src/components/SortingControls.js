@@ -50,7 +50,9 @@ function SortingControls() {
             setAlgoRunning();
             const algo = algorithmMenu[selectedAlgo];
             await algo();
-            setAlgoSorted();
+            if (!preempter.current.shouldStop) {
+                setAlgoSorted();
+            }
         } else {
             NoAlgSelected();
         }
@@ -82,7 +84,7 @@ function SortingControls() {
                 <div className='w-[98%] flex flex-col'>
                     <label htmlFor='bars-slider' className='w-full text-start mb-3 text-sm font-semibold'>Number of Elements</label>
                     <Slider 
-                        className="w-full"
+                        className="w-full mt-5"
                         defaultValue={[30]} 
                         max={80} 
                         step={1} 
