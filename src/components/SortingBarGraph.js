@@ -1,14 +1,14 @@
 "use client"
 
 import { useSortingContext } from '@/context/SortingContext'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import SortingBars from './SortingBars'
 
 const SortingBarGraph = () => {
 
     // THIS COMPONENT DEFINES THE ACTUAL WINDOW DISPLAYING THE SORTING COMPONENTS
 
-    const {algoState, delay} = useSortingContext();
+    const {algoState, delay, isFirstRenderRef, firstRenderComplete} = useSortingContext();
 
     const algoRunningShadowColorHigh = `inset 0 0 40px rgba(147, 196, 253, 0.8)`;
     const algoRunningShadowColorLow = `inset 0 0 20px rgba(147, 196, 253, 0.8)`;
@@ -24,7 +24,14 @@ const SortingBarGraph = () => {
     const [shadowState, setShadowState] = useState(atRestShadowColor);
 
 
+
+
     useEffect(() => {
+      // if (isFirstRenderRef.current) {
+      //   firstRenderComplete();
+      //   return;
+      // }
+
       async function doneAnimation() {
         setShadowState(algoSortedShadowColorHigh);
         await delay(600);
