@@ -8,7 +8,7 @@ const SortingBarGraph = () => {
 
     // THIS COMPONENT DEFINES THE ACTUAL WINDOW DISPLAYING THE SORTING COMPONENTS
 
-    const {algoState, delay, isFirstRenderRef, firstRenderComplete} = useSortingContext();
+    const {algoState, delay, isFirstRenderRef} = useSortingContext();
 
     const algoRunningShadowColorHigh = `inset 0 0 40px rgba(147, 196, 253, 0.8)`;
     const algoRunningShadowColorLow = `inset 0 0 20px rgba(147, 196, 253, 0.8)`;
@@ -27,10 +27,7 @@ const SortingBarGraph = () => {
 
 
     useEffect(() => {
-      // if (isFirstRenderRef.current) {
-      //   firstRenderComplete();
-      //   return;
-      // }
+
 
       async function doneAnimation() {
         setShadowState(algoSortedShadowColorHigh);
