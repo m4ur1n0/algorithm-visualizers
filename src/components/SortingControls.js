@@ -2,7 +2,7 @@ import { useSortingContext } from '@/context/SortingContext';
 import { Button } from './ui/button';
 import React, { useRef, useState } from 'react'
 
-import { randomize, selectionSort, bubbleSort } from '@/app/utils/sorting-algorithms';
+import { randomize, selectionSort, bubbleSort, insertionSort } from '@/app/utils/sorting-algorithms';
 import { Slider } from './ui/slider';
 import SortingDropdown from './SortingDropdown';
 import { toast } from 'sonner';
@@ -18,6 +18,7 @@ function SortingControls() {
         "none" : NoAlgSelected,
         "selection" : () => selectionSort(positions, swapPositions, preempter.current),
         "bubble" : () => bubbleSort(positions, swapPositions, preempter.current),
+        "insertion" : () => insertionSort(positions, swapPositions, preempter.current),
     }
 
 

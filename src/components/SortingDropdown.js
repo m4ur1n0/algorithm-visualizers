@@ -24,6 +24,7 @@ const SortingDropdown = ({setSelectedAlgo}) => {
             <SelectLabel>Algorithms</SelectLabel>
             <SelectItem value='selection'>Selection Sort</SelectItem>
             <SelectItem value='bubble'>Bubble Sort</SelectItem>
+            <SelectItem value='insertion'>Insertion Sort</SelectItem>
           </SelectGroup>
         </SelectContent>
       </Select>

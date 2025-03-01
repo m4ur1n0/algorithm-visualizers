@@ -3,8 +3,27 @@ const delay = async (ms) => {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+export async function randomize(barPositions, swapTwo) {
+
+    const len = barPositions.length;
+
+    for (let idx = 0; idx < len; idx++) {
+        let i = Math.floor(Math.random() * (len - 1));
+        let j = Math.floor(Math.random() * (len - 1));
+
+        await swapTwo(i, j);
+    }
+
+}
+
+// trivial sort algorithm
+    // positions is a list showing index rendered
+        // a particular VALUE is at position positions[VALUE];
+        // bar of height 0 CURRENTLY has LOCATION positions[0]
+        // 
+
 export async function bubbleSort(positions, swapTwo, preempter) {
-    // every index of position (0, 1, 2...) is actually represents where each value is
+    // every index of position (0, 1, 2...) actually represents where each value is
     // so positions[3] returns the index in the list of bars where the bar of value 3 is actually found.
     // so the goal is actually to sort by comparing indices of i and i+1
     // i.e. the actual bar value at any point in positions is positions.indexOf(i) (if i == 4, it will return the number where 4 is located on the bar graph)
@@ -70,7 +89,7 @@ export async function selectionSort(positions, swapTwo, preempter) {
             // let currVal = positions[index];
             let currVal = myPositions[index];
 
-            if (currVal < minVal) {
+                if (currVal < minVal) {
                 minVal = currVal;
                 minIndex = index;
             }
@@ -89,17 +108,30 @@ export async function selectionSort(positions, swapTwo, preempter) {
     
 }
 
+export async function insertionSort(positions, swapTwo, preempter) {
+    
+    if (preempter.shouldStop) return;
+    const n = positions.length;
+    let myPositions = [...positions]; // need that local
 
+    for (let i = 1; i < n; i++) {
+        let j = i; // looking at BAR j
+        // if j is less than its previous item, move it backward
+        // continue doing so until shit gets proper
+        
 
-export async function randomize(barPositions, swapTwo) {
+        while(j > 0 && myPositions.indexOf(j) < myPositions.indexOf(j - 1)) {
+            // if the VALUE of BAR j is LESS THAN the VALUE of BAR (j-1)
+            let r = myPositions.indexOf(j);
+            let f = myPositions.indexOf(j - 1);
+            if (preempter.shouldStop) return;
 
-    const len = barPositions.length;
+            await delay(400);
+            await swapTwo(r, f);
+            [myPositions[r], myPositions[f]] = [myPositions[f], myPositions[r]];
+            await delay(250);
 
-    for (let idx = 0; idx < len; idx++) {
-        let i = Math.floor(Math.random() * (len - 1));
-        let j = Math.floor(Math.random() * (len - 1));
-
-        await swapTwo(i, j);
+            j--
+        }
     }
-
 }
